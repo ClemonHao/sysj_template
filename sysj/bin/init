@@ -1,0 +1,89 @@
+#!/bin/bash
+
+##############################################################
+## 
+## SystemJ initialization script
+## Based on the Gradle start up script
+##
+##############################################################
+
+cygwin=false
+if [ -z $NEED_JDK ] ; then NEED_JDK=false ; fi
+
+case "`uname`" in
+	CYGWIN* )
+		cygwin=true
+		;;
+esac
+
+warn ( ) {
+    echo "$*"
+}
+
+die ( ) {
+    echo
+    echo "$*"
+    echo
+    exit 1
+}
+
+if [ $cygwin = true ] ; then
+	[ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
+fi
+
+if [ -n "$JAVA_HOME" ] ; then
+	JAVACMD="$JAVA_HOME/bin/java"
+	if [ ! -x "$JAVACMD" ] ; then
+		die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+		
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation"
+	fi
+else
+	JAVACMD="java"
+	which java >/dev/null 2>&1  || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH"
+fi
+
+if [ $NEED_JDK = true ] ; then
+	if [ -n "$JAVA_HOME" ] ; then
+		JAVACCMD="$JAVA_HOME/bin/javac"
+		if [ ! -x "$JAVACCMD" ] ; then
+			die "ERROR: Please set JAVA_HOME to JDK installation directory"
+		fi
+	else
+		JAVACCMD="javac"
+		which javac >/dev/null 2>&1  || die "ERROR: JAVA_HOME is not set and no 'javac' command could be found in your PATH"
+	fi
+fi
+
+LIBCLASSPATH=$APP_HOME/lib/\*
+CLASSPATH=$LIBCLASSPATH:\.
+
+# Parsing argument
+while [[ $# > 0 ]]
+do
+	key="$1"
+
+	case $key in
+		-cp|-classpath)
+			CLASSPATH=$LIBCLASSPATH:"$2"
+			shift
+			;;
+		*)
+			PARAM=$PARAM\ "$key"
+			;;
+	esac
+	shift
+done
+
+if $cygwin ; then
+	APP_HOME=`cygpath --path --mixed "$APP_HOME"`
+	CLASSPATH=`cygpath --path --mixed "$CLASSPATH"`
+fi
+
+function splitJvmOpts() {
+	JVM_OPTS=("$@")
+}
+
+eval splitJvmOpts $DEFAULT_JVM_OPTS $JAVA_OPTS
+
