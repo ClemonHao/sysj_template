@@ -1,2 +1,2 @@
-# says_template
+# sysj_template
 systemJ command line environment
