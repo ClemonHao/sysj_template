@@ -18,5 +18,7 @@ cd "$SAVED" >&-
 
 source $APP_HOME/bin/init
 
-exec "$JAVACMD" "${JVM_OPTS[@]}" -classpath "$CLASSPATH" com.systemj.SystemJRunner $PARAM
+#CMD="$JAVACMD -XstartOnFirstThread ${JVM_OPTS[@]} -classpath $CLASSPATH com.systemj.SystemJRunner $PARAM"
+CMD="$JAVACMD ${JVM_OPTS[@]} -classpath $CLASSPATH com.systemj.SystemJRunner $PARAM"
 
+exec $CMD

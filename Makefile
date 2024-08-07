@@ -3,12 +3,19 @@ SYSJC=$(SYSJ_HOME)/bin/sysjc
 SYSJR=$(SYSJ_HOME)/bin/sysjr
 
 TARGET_DIR=./tmpfile
-GENERATE_JAVA_FILE=$(TARGET_DIR)/source/
-COMPILE_CLASS_FILE=$(TARGET_DIR)/class/
 
-SYSJ_FILE=$(shell find ./ -name '*.sysj' -depth 1)
-GEN_JAVA_FILE=$(shell find ./ -name '*.java' -depth 1)
-XML_FILE=$(shell find ./ -name '*.xml' -depth 1)
+SOURCE_FILE_PATH=./source_file
+EXT_JAVA_FILE_PATH=src
+
+ifeq ($(SYSJ),)
+#SYSJ_FILE=$(shell find $(SOURCE_FILE_PATH) -name '*.sysj' -depth 1)
+#XML_FILE=$(shell find $(SOURCE_FILE_PATH) -name '*.xml' -depth 1)
+SYSJ_FILE=$(SOURCE_FILE_PATH)/*.sysj
+XML_FILE=$(SOURCE_FILE_PATH)/*.xml
+else
+SYSJ_FILE=$(SOURCE_FILE_PATH)/$(SYSJ).sysj
+XML_FILE=$(SOURCE_FILE_PATH)/$(SYSJ).xml
+endif
 
 ifeq ($(WINDIR),)
 	S=:
@@ -22,14 +29,18 @@ else
 	override SILENCE=--silence
 endif
 
-all:
-	$(SYSJC) $(SILENCE) --nojavac $(SYSJ_FILE) 
+GEN_JAVA_FILE=$(shell find $(TARGET_DIR) -name '*.java' -depth 1)
+EXT_JAVA_FILE=$(shell find $(SOURCE_FILE_PATH)/$(EXT_JAVA_FILE_PATH) -name '*.java')
 
-run: all
-	javac -classpath $(SYSJ_HOME)/lib/\*$(S). $(GEN_JAVA_FILE)
+all:
+	$(SYSJC) $(SILENCE) -d $(TARGET_DIR) --nojavac $(SYSJ_FILE)
+
+run:
+	javac -classpath $(SYSJ_HOME)/lib/*$(S)$(TARGET_DIR)/* -d $(TARGET_DIR) $(EXT_JAVA_FILE)
+	javac -classpath $(SYSJ_HOME)/lib/*$(S)$(TARGET_DIR)/*$(S)$(TARGET_DIR)/ -d $(TARGET_DIR) $(GEN_JAVA_FILE)
 	$(SYSJR) $(XML_FILE)
 
 clean:
-	rm -f *.class *.java
-	$(shell find ./org -name '*.class' -exec rm {} \;)
+	$(shell find ./$(TARGET_DIR) -name '*.class' -exec rm {} \;)
+	$(shell find ./$(TARGET_DIR) -name '*.java' -exec rm {} \;)
 

@@ -57,7 +57,7 @@ if [ $NEED_JDK = true ] ; then
 fi
 
 LIBCLASSPATH=$APP_HOME/lib/\*
-CLASSPATH=$LIBCLASSPATH:\.
+CLASSPATH=$LIBCLASSPATH:\.:\./tmpfile/
 
 # Parsing argument
 while [[ $# > 0 ]]
