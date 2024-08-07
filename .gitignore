@@ -1,3 +1,4 @@
 *.class
-*.class
 ./tmpfile/*.java
+./org/*.java
+./com/*.java
