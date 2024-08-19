@@ -19,6 +19,6 @@ cd "$SAVED" >&-
 source $APP_HOME/bin/init
 
 #CMD="$JAVACMD -XstartOnFirstThread ${JVM_OPTS[@]} -classpath $CLASSPATH com.systemj.SystemJRunner $PARAM"
-CMD="$JAVACMD ${JVM_OPTS[@]} -classpath $CLASSPATH com.systemj.SystemJRunner $PARAM"
+CMD="$JAVACMD ${JVM_OPTS[@]} -Xms1024m -XX:ReservedCodeCacheSize=512m -XX:+UseCodeCacheFlushing -Xmx1g -classpath $CLASSPATH com.systemj.SystemJRunner $PARAM"
 
 exec $CMD
