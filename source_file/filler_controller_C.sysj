@@ -1,0 +1,131 @@
+FillerC
+(
+    input String signal m2c_signal_liquid_C;
+    output signal c2m_signal_liquid_C;
+    output signal c2m_signal_filler_C_idle;
+    input signal c2m_signal_filler_C_check_and_start;
+
+    input signal bottleAtPos2C, bottleAtPos2CFull, dosUnitCEvac, dosUnitCAtTarget;
+    output signal valveInjectorCOnOff, valveInletCOnOff, dosUnitCValveRetract, dosUnitCValveExtend;
+)->{
+
+    signal openInjector, closeInjector;
+    signal openInlet, closeInlet;
+
+    {
+        int status = Controller_State.INITIAL;
+
+        loop
+        {
+            switch (status)
+            {
+                case Controller_State.INITIAL:
+                    emit c2m_signal_liquid_C;
+
+                    await(c2m_signal_filler_C_check_and_start);
+                    status = Controller_State.CHECK_BOTTLE;
+
+                    break;
+
+                case Controller_State.CHECK_BOTTLE:
+                    //not bottle here
+
+                    present (bottleAtPos2C)
+                    {
+                        status = Controller_State.DO_PROCESS;
+                    }
+                    else
+                    {
+                        status = Controller_State.IDLE;
+                    }
+                    break;
+
+                case Controller_State.DO_PROCESS:
+                    System.out.println("filler C do process");
+                    //check queue.GetCurrentIngredient();
+
+                    FillerHandler.liquid_queue_C.PopOneBottle();
+
+                    emit openInjector;
+
+                    pause;
+
+                    present (dosUnitCEvac)
+                    {
+                        abort (dosUnitCAtTarget) { sustain dosUnitCValveRetract;}
+                    }
+                    else
+                    {}
+
+                    emit closeInjector;
+
+                    pause;
+
+                    emit openInlet;
+
+                    pause;
+
+                    abort (dosUnitCEvac || bottleAtPos2CFull) { sustain dosUnitCValveExtend; }
+
+                    // if the bottle is full, close inlet, open injector, let the liquid back to the bank.
+                    present (bottleAtPos2CFull)
+                    {
+                        emit closeInlet;
+                        emit openInjector;
+                        pause;
+
+                        abort (dosUnitCEvac) { sustain dosUnitCValveExtend; }
+                    }
+                    else
+                    {}
+
+                    emit closeInlet;
+
+                    status = Controller_State.IDLE;
+                    break;
+
+                case Controller_State.IDLE:
+                    emit c2m_signal_filler_C_idle;
+                    await(c2m_signal_filler_C_check_and_start);
+
+                    status = Controller_State.CHECK_BOTTLE;
+                    break;
+
+                default:
+                    break;
+            }
+            pause;
+        }
+    }
+    ||
+    {
+        loop
+        {
+            await(m2c_signal_liquid_C);
+            //upate ingredient list
+
+            FillerHandler.liquid_queue_C.PushOneQueue((String)#m2c_signal_liquid_C);
+            pause;
+        }
+    }
+    ||
+    {
+        loop {
+            await (openInjector);
+
+            abort (closeInjector) { sustain valveInjectorCOnOff; }
+
+            pause;
+        }
+    }
+    ||
+    {
+        loop {
+            await (openInlet);
+
+            abort (closeInlet) { sustain valveInletCOnOff; }
+
+            pause;
+        }
+    }
+}

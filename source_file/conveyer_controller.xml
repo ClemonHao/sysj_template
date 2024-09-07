@@ -1,0 +1,15 @@
+<System xmlns="http://systemjtechnology.com">
+	<SubSystem Name="Conveyer" Local="true">
+		<ClockDomain Name="ControllerConveyerCD" Class="ControllerConveyer">
+
+			<iSignal Name="s2c_signal_conveyer_register_done" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10031" />
+			<oSignal Name="c2s_signal_conveyer_register" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10030" />
+			<iSignal Name="s2c_signal_conveyer_move2next" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10033" />
+			<oSignal Name="c2s_signal_conveyer_finished" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10050" />
+
+			<iSignal Name="bottleAtPos1" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40000" />
+			<iSignal Name="bottleLeftPos5" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40001" />
+			<oSignal Name="motConveyorOnOff" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41000" />
+		</ClockDomain>
+	</SubSystem>
+</System>

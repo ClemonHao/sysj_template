@@ -1,0 +1,65 @@
+ControllerConveyer
+(
+    input signal s2c_signal_conveyer_register_done;
+    output signal c2s_signal_conveyer_register;
+    input signal s2c_signal_conveyer_move2next;
+    output signal c2s_signal_conveyer_idle;
+    output signal c2s_signal_conveyer_finished;
+
+    input signal bottleAtPos1, bottleLeftPos5;
+    output signal motConveyorOnOff;
+)->{
+
+    int status = Controller_State.INITIAL;
+
+    loop
+    {
+        switch (status)
+        {
+            case Controller_State.INITIAL:
+                emit c2s_signal_conveyer_register;
+                await(s2c_signal_conveyer_register_done);
+    
+                status = Controller_State.CHECK_BOTTLE;
+                break;
+
+            case Controller_State.CHECK_BOTTLE:
+
+                //not bottle here
+                present (bottleLeftPos5 || bottleLeftPos5)
+                {
+                    status = Controller_State.DO_PROCESS;
+                }
+                else
+                {
+                    status = Controller_State.IDLE;
+                }
+                break;
+
+            case Controller_State.DO_PROCESS:
+                    
+                //no process for conveyer here
+                System.out.println("conveyer do process");
+
+                status = Controller_State.IDLE;
+                break;
+
+            case Controller_State.IDLE:
+                emit c2s_signal_conveyer_idle;
+                //waiting for signal "move2NextPos"
+
+                await(s2c_signal_conveyer_move2next);
+
+                abort (bottleAtPos1) { sustain motConveyorOnOff; }
+                abort (bottleLeftPos5) { sustain motConveyorOnOff; }
+
+                emit c2s_signal_conveyer_finished;
+                status = Controller_State.CHECK_BOTTLE;
+                break;
+
+            default:
+                break;
+        }
+        pause;
+    }
+}

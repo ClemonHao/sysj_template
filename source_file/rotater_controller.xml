@@ -1,0 +1,17 @@
+<System xmlns="http://systemjtechnology.com">
+	<SubSystem Name="Rotater" Local="true">
+		<ClockDomain Name="ControllerRotaterCD" Class="ControllerRotater">
+			<iSignal Name="s2c_signal_rotater_register_done" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10021" />
+			<oSignal Name="c2s_signal_rotater_register" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10020" />
+			<iSignal Name="s2c_signal_rotater_move2next" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10012" />
+			<oSignal Name="c2s_signal_rotater_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10022" />
+			<oSignal Name="c2s_signal_rotater_finished" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10023" />
+
+
+			<iSignal Name="tableAlignedWithSensor" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40011" />
+			<iSignal Name="bottleAtPos5" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40012" />
+			<iSignal Name="capOnBottleAtPos1" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40013" />
+			<oSignal Name="rotaryTableTrigger" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41014" />
+		</ClockDomain>
+	</SubSystem>
+</System>

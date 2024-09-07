@@ -1,0 +1,21 @@
+<System xmlns="http://systemjtechnology.com">
+	<SubSystem Name="FillerD" Local="true">
+		<ClockDomain Name="FillerDCD" Class="FillerD">
+			<iSignal Name="m2c_signal_liquid_D" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20032" />
+			<oSignal Name="c2m_signal_liquid_D" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20031" />
+			<oSignal Name="c2m_signal_filler_D_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20033" />
+			<iSignal Name="c2m_signal_filler_D_check_and_start" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20034" />
+            
+            <iSignal Name="bottleAtPos2D" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40005" />
+			<iSignal Name="bottleAtPos2DFull" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40403" />
+			<iSignal Name="dosUnitDEvac" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40404" />
+			<iSignal Name="dosUnitDAtTarget" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40405" />
+
+			<oSignal Name="valveInjectorDOnOff" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41014" />
+			<oSignal Name="valveInletDOnOff" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41015" />
+			<oSignal Name="dosUnitDValveRetract" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41016" />
+			<oSignal Name="dosUnitDValveExtend" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41017" />
+
+		</ClockDomain>
+	</SubSystem>
+</System>

@@ -1,0 +1,33 @@
+<System xmlns="http://systemjtechnology.com">
+	<SubSystem Name="Coordinator" Local="true">
+		<ClockDomain Name="CoordinatorCD" Class="Coordinator">
+			<iSignal Name="s2c_signal_capper_register_done" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10000" />
+			<oSignal Name="s2c_signal_capper_register_done" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10001" />
+			<iSignal Name="c2s_signal_capper_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10002" />
+			<oSignal Name="s2c_signal_capper_move2next" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10003" />
+			<oSignal Name="s2c_signal_capper_do_process" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10004" />
+
+			<iSignal Name="c2s_signal_filler_register" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10010" />
+			<oSignal Name="s2c_signal_filler_register_done" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10011" />
+			<iSignal Name="c2s_signal_filler_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10012" />
+			<oSignal Name="s2c_signal_filler_move2next" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10013" />
+			<oSignal Name="s2c_signal_filler_do_process" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10014" />
+
+			<iSignal Name="c2s_signal_rotater_register" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10020" />
+			<oSignal Name="s2c_signal_rotater_register_done" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10021" />
+			<iSignal Name="c2s_signal_rotater_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10022" />
+			<oSignal Name="s2c_signal_rotater_move2next" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10023" />
+
+			<iSignal Name="c2s_signal_conveyer_register" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10030" />
+			<oSignal Name="s2c_signal_conveyer_register_done" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10031" />
+			<iSignal Name="c2s_signal_conveyer_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10032" />
+			<oSignal Name="s2c_signal_conveyer_move2next" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10033" />
+
+			<iSignal Name="c2s_signal_conveyer_finished" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10050" />
+			<iSignal Name="c2s_signal_rotater_finished" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10051" />
+
+			<iSignal Name="input_signal_from_cloud" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10100" />
+			<oSignal Name="output_signal_to_cloud" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10101" />
+		</ClockDomain>
+	</SubSystem>
+</System>
