@@ -1,7 +1,7 @@
 <System xmlns="http://systemjtechnology.com">
 	<SubSystem Name="Coordinator" Local="true">
 		<ClockDomain Name="CoordinatorCD" Class="Coordinator">
-			<iSignal Name="s2c_signal_capper_register_done" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10000" />
+			<iSignal Name="c2s_signal_capper_register" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10000" />
 			<oSignal Name="s2c_signal_capper_register_done" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10001" />
 			<iSignal Name="c2s_signal_capper_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10002" />
 			<oSignal Name="s2c_signal_capper_move2next" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10003" />

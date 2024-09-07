@@ -30,7 +30,7 @@ FillerMiddleware
 )->{
 
     {
-        int status = Controller_State.REGISTER;
+        int status = Controller_State.INITIAL;
         loop
         {
             switch (status)
@@ -38,15 +38,23 @@ FillerMiddleware
                 case Controller_State.INITIAL:
                     //filler register
                     if (FillerMiddlewareHandler.ingredient.GetCapacity() == FillerMiddlewareHandler.filler_list.GetListSize())
-                        status = Coordinator_State.DO_PROCESS;
+                    {
+                        status = Controller_State.REGISTER;
+                        System.out.println("filler current status " + status);
+                    }
 
                     break;
 
                 case Controller_State.REGISTER:
                     emit c2s_signal_filler_register;
-                    await(s2c_signal_filler_register_done);
+                    present(s2c_signal_filler_register_done)
+                    {
+                        status = Controller_State.PREPARE_FOR_PROCESS;
+                        System.out.println("filler current status " + status);
+                    }
+                    else
+                    {}
 
-                    status = Controller_State.PREPARE_FOR_PROCESS;
                     break;
 
                 case Controller_State.PREPARE_FOR_PROCESS:

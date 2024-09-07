@@ -23,15 +23,21 @@ ControllerCapper
             {
                 case Controller_State.INITIAL:
                     emit c2s_signal_capper_register;
-                    await(s2c_signal_capper_register_done);
+                    present (s2c_signal_capper_register_done)
+                    {
+                        status = Controller_State.PREPARE_FOR_PROCESS;
+                        System.out.println("Controller current status " + status);
+                    }
+                    else
+                    {}
 
-                    status = Controller_State.PREPARE_FOR_PROCESS;
                     break;
                 case Controller_State.PREPARE_FOR_PROCESS:
                     //check sensors here
                     await (s2c_signal_capper_do_process);
 
                     status = Controller_State.CHECK_BOTTLE;
+                    System.out.println("Controller current status " + status);
                     break;
 
                 case Controller_State.CHECK_BOTTLE:
@@ -40,10 +46,12 @@ ControllerCapper
                     present (bottleAtPos4)
                     {
                         status = Controller_State.DO_PROCESS;
+                        System.out.println("Controller current status " + status);
                     }
                     else
                     {
                         status = Controller_State.IDLE;
+                        System.out.println("Controller current status " + status);
                     }
                     break;
 
@@ -71,6 +79,7 @@ ControllerCapper
                     emit unclampBottle;
 
                     status = Controller_State.IDLE;
+                    System.out.println("Controller current status " + status);
                     break;
 
                 case Controller_State.IDLE:
@@ -79,6 +88,7 @@ ControllerCapper
 
                     await(s2c_signal_capper_move2next);
                     status = Controller_State.PREPARE_FOR_PROCESS;
+                    System.out.println("Controller current status " + status);
                     break;
 
                 default:

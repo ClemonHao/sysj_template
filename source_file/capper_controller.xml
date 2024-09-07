@@ -1,8 +1,8 @@
 <System xmlns="http://systemjtechnology.com">
 	<SubSystem Name="Capper" Local="true">
 		<ClockDomain Name="ControllerCapperCD" Class="ControllerCapper">
-			<iSignal Name="s2c_signal_capper_register_done" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10000" />
-			<oSignal Name="c2s_signal_capper_register" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10001" />
+			<iSignal Name="s2c_signal_capper_register_done" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10001" />
+			<oSignal Name="c2s_signal_capper_register" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10000" />
 			<iSignal Name="s2c_signal_capper_move2next" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10003" />
 			<iSignal Name="s2c_signal_capper_do_process" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10004" />
 			<oSignal Name="c2s_signal_capper_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10002" />

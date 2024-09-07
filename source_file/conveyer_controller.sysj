@@ -18,9 +18,14 @@ ControllerConveyer
         {
             case Controller_State.INITIAL:
                 emit c2s_signal_conveyer_register;
-                await(s2c_signal_conveyer_register_done);
+                present(s2c_signal_conveyer_register_done)
+                {
+                    status = Controller_State.CHECK_BOTTLE;
+                    System.out.println("Conveyer current status " + status);
+                }
+                else
+                {}
     
-                status = Controller_State.CHECK_BOTTLE;
                 break;
 
             case Controller_State.CHECK_BOTTLE:
@@ -29,6 +34,7 @@ ControllerConveyer
                 present (bottleLeftPos5 || bottleLeftPos5)
                 {
                     status = Controller_State.DO_PROCESS;
+                    System.out.println("Conveyer current status " + status);
                 }
                 else
                 {
@@ -42,6 +48,7 @@ ControllerConveyer
                 System.out.println("conveyer do process");
 
                 status = Controller_State.IDLE;
+                System.out.println("Conveyer current status " + status);
                 break;
 
             case Controller_State.IDLE:
@@ -55,6 +62,7 @@ ControllerConveyer
 
                 emit c2s_signal_conveyer_finished;
                 status = Controller_State.CHECK_BOTTLE;
+                System.out.println("Conveyer current status " + status);
                 break;
 
             default:

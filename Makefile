@@ -29,15 +29,19 @@ else
 	override SILENCE=--silence
 endif
 
-GEN_JAVA_FILE=$(shell find $(TARGET_DIR) -name '*.java' -depth 1)
 EXT_JAVA_FILE=$(shell find $(SOURCE_FILE_PATH)/$(EXT_JAVA_FILE_PATH) -name '*.java')
+
+ifeq ($(JAVA_FILE), )
+JAVA_FILE_PREFIX=$(shell cat $(XML_FILE) | grep ClockDomain | grep Class | cut -d ' ' -f3 | grep -oE '[^\"]'+ | grep -v Class | grep -v '>')
+JAVA_FILE=$(JAVA_FILE_PREFIX).java
+endif
 
 all:
 	$(SYSJC) $(SILENCE) -d $(TARGET_DIR) --nojavac $(SYSJ_FILE)
 
 run:
 	javac -classpath $(SYSJ_HOME)/lib/*$(S)$(TARGET_DIR)/* -d $(TARGET_DIR) $(EXT_JAVA_FILE)
-	javac -classpath $(SYSJ_HOME)/lib/*$(S)$(TARGET_DIR)/*$(S)$(TARGET_DIR)/ -d $(TARGET_DIR) $(GEN_JAVA_FILE)
+	javac -classpath $(SYSJ_HOME)/lib/*$(S)$(TARGET_DIR)/*$(S)$(TARGET_DIR)/ -d $(TARGET_DIR) ./tmpfile/$(JAVA_FILE)
 	$(SYSJR) $(XML_FILE)
 
 clean:

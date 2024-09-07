@@ -44,6 +44,7 @@ Coordinator
                     if (controller_amount == ControllerHandler.controller_list.GetListSize())
                     {
                         status = Coordinator_State.DO_PROCESS;
+                        System.out.println("Coordinator current status " + status);
                     }
                     emit s2c_signal_conveyer_move2next;
 
@@ -59,6 +60,7 @@ Coordinator
                     emit s2c_signal_capper_do_process;
 
                     status = Coordinator_State.WAITING_FOR_IDLE;
+                    System.out.println("Coordinator current status " + status);
                     break;
 
                 case Coordinator_State.WAITING_FOR_IDLE:
@@ -67,7 +69,10 @@ Coordinator
 
                     //boardcast message
                     if (true == ControllerHandler.controller_list.CheckAllIdleState())
+                    {
                         status = Coordinator_State.SENDING_MOVE_COMMAND;
+                        System.out.println("Coordinator current status " + status);
+                    }
 
                     break;
                 case Coordinator_State.SENDING_MOVE_COMMAND:
@@ -86,6 +91,7 @@ Coordinator
                     ControllerHandler.controller_list.ResetAllIdleState();
 
                     status = Coordinator_State.DO_PROCESS;
+                    System.out.println("Coordinator current status " + status);
                     break;
 
                 default:
@@ -98,9 +104,10 @@ Coordinator
     {
         //capper thread
         String module = new String("capper");
+        System.out.println("Coordinator waiting for controller " + module);
         await(c2s_signal_capper_register);
-        ControllerHandler.controller_list.AddController(module);
         emit s2c_signal_capper_register_done;
+        ControllerHandler.controller_list.AddController(module);
 
         loop
         {
@@ -114,9 +121,10 @@ Coordinator
     {
         //filler thread
         String module = new String("filler");
+        System.out.println("Coordinator waiting for controller " + module);
         await(c2s_signal_filler_register);
-        ControllerHandler.controller_list.AddController(module);
         emit s2c_signal_filler_register_done;
+        ControllerHandler.controller_list.AddController(module);
 
         loop
         {
@@ -130,9 +138,10 @@ Coordinator
     {
         //rotater thread
         String module = new String("rotater");
+        System.out.println("Coordinator waiting for controller " + module);
         await(c2s_signal_rotater_register);
-        ControllerHandler.controller_list.AddController(module);
         emit s2c_signal_rotater_register_done;
+        ControllerHandler.controller_list.AddController(module);
 
         loop
         {
@@ -146,9 +155,11 @@ Coordinator
     {
         //conveyer thread
         String module = new String("conveyer");
+        System.out.println("Coordinator waiting for controller " + module);
         await(c2s_signal_conveyer_register);
-        ControllerHandler.controller_list.AddController(module);
         emit s2c_signal_conveyer_register_done;
+
+        ControllerHandler.controller_list.AddController(module);
 
         loop
         {
