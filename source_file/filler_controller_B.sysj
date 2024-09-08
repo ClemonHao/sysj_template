@@ -3,6 +3,7 @@ FillerB
     input String signal m2c_signal_liquid_B;
     output signal c2m_signal_liquid_B;
     output signal c2m_signal_filler_B_idle;
+    output boolean signal c2m_signal_filler_B_no_bottle;
     input signal c2m_signal_filler_B_check_and_start;
 
     input signal bottleAtPos2B, bottleAtPos2BFull, dosUnitBEvac, dosUnitBAtTarget;
@@ -20,9 +21,12 @@ FillerB
             {
                 case Controller_State.INITIAL:
                     emit c2m_signal_liquid_B;
+                    emit c2m_signal_liquid_B;
+                    emit c2m_signal_liquid_B;
 
                     await(c2m_signal_filler_B_check_and_start);
                     status = Controller_State.CHECK_BOTTLE;
+                    System.out.println("Filler B current status " + status);
 
                     break;
 
@@ -31,41 +35,43 @@ FillerB
 
                     present (bottleAtPos2B)
                     {
+                        emit c2m_signal_filler_B_no_bottle(false);
                         status = Controller_State.DO_PROCESS;
+                        System.out.println("Filler B current status " + status);
                     }
                     else
                     {
-                        status = Controller_State.IDLE;
+                        emit c2m_signal_filler_B_no_bottle(true);
                     }
                     break;
 
                 case Controller_State.DO_PROCESS:
                     System.out.println("filler B do process");
                     //check queue.GetCurrentIngredient();
-                    FillerHandler.liquid_queue_B.PopOneBottle();
 
                     emit openInjector;
 
+                    System.out.println("Filler B emit openInletor");
                     pause;
 
                     present (dosUnitBEvac)
                     {
+                        System.out.println("Filler B get dosUnitAEvac");
                         abort (dosUnitBAtTarget) { sustain dosUnitBValveRetract;}
                     }
                     else
                     {}
 
                     emit closeInjector;
-
+                    System.out.println("Filler B get emit closeInjector");
                     pause;
 
                     emit openInlet;
-
+                    System.out.println("Filler B get emit openInlet");
                     pause;
 
                     abort (dosUnitBEvac || bottleAtPos2BFull) { sustain dosUnitBValveExtend; }
 
-                    // if the bottle is full, close inlet, open injector, let the liquid back to the bank.
                     present (bottleAtPos2BFull)
                     {
                         emit closeInlet;
@@ -78,16 +84,21 @@ FillerB
                     {}
 
                     emit closeInlet;
+                    System.out.println("Filler B get emit closeInlet");
 
-
+                    FillerHandler.getInstance().liquid_queue_B.PopOneBottle();
                     status = Controller_State.IDLE;
+                    System.out.println("Filler B current status " + status);
                     break;
 
                 case Controller_State.IDLE:
                     emit c2m_signal_filler_B_idle;
+                    emit c2m_signal_filler_B_idle;
+                    emit c2m_signal_filler_B_idle;
                     await(c2m_signal_filler_B_check_and_start);
 
                     status = Controller_State.CHECK_BOTTLE;
+                    System.out.println("Filler B current status " + status);
                     break;
 
                 default:
@@ -102,14 +113,17 @@ FillerB
         {
             await(m2c_signal_liquid_B);
             //upate ingredient list
+            String tmpstr = (String)#m2c_signal_liquid_B;
 
-            FillerHandler.liquid_queue_B.PushOneQueue((String)#m2c_signal_liquid_B);
+            System.out.println("Filler B get " + tmpstr);
+            FillerHandler.getInstance().liquid_queue_B.PushOneQueue(tmpstr);
             pause;
         }
     }
     ||
     {
-        loop {
+        loop
+        {
             await (openInjector);
 
             abort (closeInjector) { sustain valveInjectorBOnOff; }
@@ -119,7 +133,8 @@ FillerB
     }
     ||
     {
-        loop {
+        loop
+        {
             await (openInlet);
 
             abort (closeInlet) { sustain valveInletBOnOff; }

@@ -11,21 +11,25 @@
 			<oSignal Name="m2c_signal_liquid_A" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20002" />
 			<iSignal Name="c2m_signal_filler_A_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20003" />
 			<oSignal Name="c2m_signal_filler_A_check_and_start" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20004" />
+			<iSignal Name="c2m_signal_filler_A_no_bottle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20005" />
 
 			<iSignal Name="c2m_signal_liquid_B" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20011" />
 			<oSignal Name="m2c_signal_liquid_B" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20012" />
 			<iSignal Name="c2m_signal_filler_B_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20013" />
 			<oSignal Name="c2m_signal_filler_B_check_and_start" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20014" />
+			<iSignal Name="c2m_signal_filler_B_no_bottle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20015" />
 
 			<iSignal Name="c2m_signal_liquid_C" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20021" />
 			<oSignal Name="m2c_signal_liquid_C" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20022" />
 			<iSignal Name="c2m_signal_filler_C_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20023" />
 			<oSignal Name="c2m_signal_filler_C_check_and_start" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20024" />
+			<iSignal Name="c2m_signal_filler_C_no_bottle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20025" />
 
 			<iSignal Name="c2m_signal_liquid_D" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20031" />
 			<oSignal Name="m2c_signal_liquid_D" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20032" />
 			<iSignal Name="c2m_signal_filler_D_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20033" />
 			<oSignal Name="c2m_signal_filler_D_check_and_start" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20034" />
+			<iSignal Name="c2m_signal_filler_D_no_bottle" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20035" />
 
 			<iSignal Name="s2c_signal_filler_order" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20050" />
 		</ClockDomain>

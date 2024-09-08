@@ -31,6 +31,12 @@ Coordinator
     output String signal s2c_signal_filler_order;
 )->{
 
+    signal Sync;
+    signal modelConveyer;
+    signal modelFiller;
+    signal modelRotater;
+    signal modelCapper;
+
     {
         int status = Coordinator_State.INITIAL;
         int controller_amount = 4;
@@ -41,12 +47,11 @@ Coordinator
             {
                 case Coordinator_State.INITIAL:
                     //update controller_list
-                    if (controller_amount == ControllerHandler.controller_list.GetListSize())
+                    if (controller_amount == ControllerHandler.getInstance().controller_list.GetListSize())
                     {
                         status = Coordinator_State.DO_PROCESS;
                         System.out.println("Coordinator current status " + status);
                     }
-                    emit s2c_signal_conveyer_move2next;
 
                     break;
 
@@ -54,9 +59,11 @@ Coordinator
                     //wait move finished
                     //await();
 
-                    await(c2s_signal_conveyer_finished);
+                    await(c2s_signal_rotater_finished);
 
                     emit s2c_signal_filler_do_process;
+                    emit s2c_signal_filler_do_process;
+                    emit s2c_signal_capper_do_process;
                     emit s2c_signal_capper_do_process;
 
                     status = Coordinator_State.WAITING_FOR_IDLE;
@@ -65,10 +72,12 @@ Coordinator
 
                 case Coordinator_State.WAITING_FOR_IDLE:
                     //check status
-                    System.out.println("waiting for idle signal");
+
+                    await (Sync);
 
                     //boardcast message
-                    if (true == ControllerHandler.controller_list.CheckAllIdleState())
+                    //if (true == ControllerHandler.getInstance().controller_list.CheckAllIdleState())
+                    if (true)
                     {
                         status = Coordinator_State.SENDING_MOVE_COMMAND;
                         System.out.println("Coordinator current status " + status);
@@ -76,22 +85,44 @@ Coordinator
 
                     break;
                 case Coordinator_State.SENDING_MOVE_COMMAND:
+                    //4
 
                     emit s2c_signal_filler_move2next;
                     emit s2c_signal_capper_move2next;
                     emit s2c_signal_rotater_move2next;
                     emit s2c_signal_conveyer_move2next;
 
-
                     //waiting controller_list --;
                     //queue++
-                    ControllerHandler.bottle_queue.dequeue();
-                    ControllerHandler.bottle_queue.enqueue(ControllerHandler.waiting_list.PopBottle());
+                    //ControllerHandler.getInstance().bottle_queue.dequeue();
+                    //ControllerHandler.getInstance().bottle_queue.enqueue(ControllerHandler.getInstance().waiting_list.PopBottle());
 
-                    ControllerHandler.controller_list.ResetAllIdleState();
+                    String str = ControllerHandler.getInstance().waiting_list.PopBottle().ToJsonString();
+                    emit output_signal_to_cloud(str);
+                    System.out.println(str);
 
-                    status = Coordinator_State.DO_PROCESS;
-                    System.out.println("Coordinator current status " + status);
+                    ControllerHandler.getInstance().controller_list.ResetAllIdleState();
+
+                    //if (ControllerHandler.getInstance().bottle_queue.isEmpty() && ControllerHandler.getInstance().waiting_list.IsEmpty())
+                    if (ControllerHandler.getInstance().waiting_list.IsEmpty())
+                    {
+                        status = Coordinator_State.WAITING_FOR_ORDER;
+                        System.out.println("Coordinator current status " + status);
+                    }
+                    else
+                    {
+                        status = Coordinator_State.DO_PROCESS;
+                        System.out.println("Coordinator current status " + status);
+                    }
+                    break;
+
+                case Coordinator_State.WAITING_FOR_ORDER:
+
+                    if (!ControllerHandler.getInstance().waiting_list.IsEmpty())
+                    {
+                        status = Coordinator_State.DO_PROCESS;
+                        System.out.println("Coordinator current status " + status);
+                    }
                     break;
 
                 default:
@@ -102,70 +133,118 @@ Coordinator
     }
     ||
     {
-        //capper thread
         String module = new String("capper");
         System.out.println("Coordinator waiting for controller " + module);
-        await(c2s_signal_capper_register);
-        emit s2c_signal_capper_register_done;
-        ControllerHandler.controller_list.AddController(module);
 
         loop
         {
-            await(c2s_signal_capper_idle);
-            ControllerHandler.controller_list.SetSpecificState(module);
-            System.out.println("Coordinator get idle from " + module);
+            //capper thread
+            await(c2s_signal_capper_register);
+            for (int i = 0; i < 20; ++i)
+            {
+                emit s2c_signal_capper_register_done;
+                pause;
+            }
+            System.out.println("Coordinator emit s2c_signal_capper_register_done");
+            ControllerHandler.getInstance().controller_list.AddController(module);
+
+            ControllerHandler.getInstance().controller_list.SetSpecificStateForbidden(module);
+            loop
+            {
+                await(c2s_signal_capper_idle);
+                emit modelCapper;
+                ControllerHandler.getInstance().controller_list.SetSpecificState(module);
+                //System.out.println("Coordinator get idle from " + module);
+                pause;
+            }
             pause;
         }
     }
     ||
     {
-        //filler thread
         String module = new String("filler");
         System.out.println("Coordinator waiting for controller " + module);
-        await(c2s_signal_filler_register);
-        emit s2c_signal_filler_register_done;
-        ControllerHandler.controller_list.AddController(module);
 
         loop
         {
-            await(c2s_signal_capper_idle);
-            ControllerHandler.controller_list.SetSpecificState(module);
-            System.out.println("Coordinator get idle from " + module);
+            //filler thread
+            await(c2s_signal_filler_register);
+            for (int i = 0; i < 20; ++i)
+            {
+                emit s2c_signal_filler_register_done;
+                pause;
+            }
+            System.out.println("Coordinator emit s2c_signal_filler_register_done");
+            ControllerHandler.getInstance().controller_list.AddController(module);
+
+            loop
+            {
+                await(c2s_signal_filler_idle);
+                emit modelFiller;
+                ControllerHandler.getInstance().controller_list.SetSpecificState(module);
+                //System.out.println("Coordinator get idle from " + module);
+                pause;
+            }
             pause;
         }
     }
     ||
     {
-        //rotater thread
         String module = new String("rotater");
         System.out.println("Coordinator waiting for controller " + module);
-        await(c2s_signal_rotater_register);
-        emit s2c_signal_rotater_register_done;
-        ControllerHandler.controller_list.AddController(module);
-
+        
         loop
         {
-            await(c2s_signal_rotater_idle);
-            ControllerHandler.controller_list.SetSpecificState(module);
-            System.out.println("Coordinator get idle from " + module);
+            //rotater thread
+            await(c2s_signal_rotater_register);
+            for (int i = 0; i < 20; ++i)
+            {
+                emit s2c_signal_rotater_register_done;
+                pause;
+            }
+
+            System.out.println("Coordinator emit s2c_signal_rotater_register_done");
+            ControllerHandler.getInstance().controller_list.AddController(module);
+
+            ControllerHandler.getInstance().controller_list.SetSpecificStateForbidden(module);
+            loop
+            {
+                await(c2s_signal_rotater_idle);
+                emit modelRotater;
+                ControllerHandler.getInstance().controller_list.SetSpecificState(module);
+                //System.out.println("Coordinator get idle from " + module);
+                pause;
+            }
             pause;
         }
     }
     ||
     {
-        //conveyer thread
         String module = new String("conveyer");
         System.out.println("Coordinator waiting for controller " + module);
-        await(c2s_signal_conveyer_register);
-        emit s2c_signal_conveyer_register_done;
-
-        ControllerHandler.controller_list.AddController(module);
 
         loop
         {
-            await(c2s_signal_conveyer_idle);
-            ControllerHandler.controller_list.SetSpecificState(module);
-            System.out.println("Coordinator get idle from " + module);
+            //conveyer thread
+            await(c2s_signal_conveyer_register);
+            for (int i = 0; i < 20; ++i)
+            {
+                emit s2c_signal_conveyer_register_done;
+                pause;
+            }
+
+            System.out.println("Coordinator emit s2c_signal_conveyer_register_done");
+
+            ControllerHandler.getInstance().controller_list.AddController(module);
+
+            ControllerHandler.getInstance().controller_list.SetSpecificStateForbidden(module);
+            loop
+            {
+                await(c2s_signal_conveyer_idle);
+                ControllerHandler.getInstance().controller_list.SetSpecificState(module);
+                //System.out.println("Coordinator get idle from " + module);
+                pause;
+            }
             pause;
         }
     }
@@ -176,18 +255,43 @@ Coordinator
         {
             await(input_signal_from_cloud);
             //relay signal
+
+            waitl(300ms);
+
+            System.out.println("Coordinator get message from cloud " + (String)#input_signal_from_cloud);
             emit s2c_signal_filler_order((String)#input_signal_from_cloud);
-            ControllerHandler.waiting_list.AppendListWithJson((String)#input_signal_from_cloud);
+
+            ControllerHandler.getInstance().waiting_list.AppendListWithJson((String)#input_signal_from_cloud);
+            //if (!ControllerHandler.getInstance().bottle_queue.isFull())
+            //    ControllerHandler.getInstance().bottle_queue.enqueue(ControllerHandler.getInstance().waiting_list.PopBottle());
+
             pause;
         }
     }
-    ||
+   ||
     {
+        int count = 0;
         loop
         {
-            await(c2s_signal_conveyer_finished);
-            emit output_signal_to_cloud(ControllerHandler.bottle_queue.GetLastPopStringJson());
-            //System.out.println(ControllerHandler.bottle_queue.GetLastPopStringJson());
+            present(modelCapper)
+            {
+                count |= 4;
+            }
+            else
+            {}
+
+            present(modelFiller)
+            {
+                count |= 2;
+            }
+            else
+            {}
+
+            if (count == 6)
+            {
+                emit Sync;
+                count = 0;
+            }
             pause;
         }
     }

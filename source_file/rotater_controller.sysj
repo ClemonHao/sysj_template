@@ -18,47 +18,46 @@ ControllerRotater
             {
                 case Controller_State.INITIAL:
                     emit c2s_signal_rotater_register;
-                    present (s2c_signal_rotater_register_done)
-                    {
-                        status = Controller_State.CHECK_BOTTLE;
-                        System.out.println("Rotater current status " + status);
-                    }
-                    else
-                    {}
+                    System.out.println("waiting for s2c_signal_rotater_register_done");
 
-                    break;
+                    await (s2c_signal_rotater_register_done);
+                    
+                    status = Controller_State.IDLE;
+                    System.out.println("Rotater current status " + status);
 
-                case Controller_State.CHECK_BOTTLE:
-                    //not bottle here
-
-                    present (bottleAtPos5 || capOnBottleAtPos1)
-                    {
-                        status = Controller_State.DO_PROCESS;
-                    }
-                    else
-                    {
-                        status = Controller_State.IDLE;
-                    }
                     break;
 
                 case Controller_State.DO_PROCESS:
-                    //TODO do process here
 
-                    System.out.println("do process");
+                    present (bottleAtPos5 || capOnBottleAtPos1)
+                    {}
+                    else
+                    {
+                        emit rotaryTableTrigger;
 
-                    status = Controller_State.IDLE;
+                        pause;
+                        pause;
+                        pause;
+
+                        present (tableAlignedWithSensor)
+                        {
+                            status = Controller_State.IDLE;
+                            System.out.println("Rotater current status " + status);
+                        }
+                        else
+                        {}
+                    }
                     break;
 
                 case Controller_State.IDLE:
                     emit c2s_signal_rotater_idle;
-                    await(s2c_signal_rotater_move2next);
+                    emit c2s_signal_rotater_idle;
+                    emit c2s_signal_rotater_idle;
 
-                    emit rotaryTableTrigger;
-
-                    present (tableAlignedWithSensor)
+                    present(s2c_signal_rotater_move2next)
                     {
-                        emit c2s_signal_rotater_finished;
-                        status = Controller_State.CHECK_BOTTLE;
+                        status = Controller_State.DO_PROCESS;
+                        System.out.println("Rotater current status " + status);
                     }
                     else
                     {}
@@ -68,6 +67,20 @@ ControllerRotater
                 default:
                     break;
             }
+            pause;
+        }
+    }
+    ||
+    {
+        loop
+        {
+            present (tableAlignedWithSensor)
+            {
+                emit c2s_signal_rotater_finished;
+            }
+            else
+            {}
+
             pause;
         }
     }

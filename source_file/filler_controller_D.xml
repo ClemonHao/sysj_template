@@ -5,16 +5,17 @@
 			<oSignal Name="c2m_signal_liquid_D" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20031" />
 			<oSignal Name="c2m_signal_filler_D_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20033" />
 			<iSignal Name="c2m_signal_filler_D_check_and_start" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="20034" />
+			<oSignal Name="c2m_signal_filler_D_no_bottle" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20035" />
             
-            <iSignal Name="bottleAtPos2D" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40005" />
-			<iSignal Name="bottleAtPos2DFull" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40403" />
-			<iSignal Name="dosUnitDEvac" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40404" />
-			<iSignal Name="dosUnitDAtTarget" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40405" />
+            <iSignal Name="bottleAtPos2D" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="40005" />
+			<iSignal Name="bottleAtPos2DFull" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="40005" />
+			<iSignal Name="dosUnitDEvac" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="40005" />
+			<iSignal Name="dosUnitDAtTarget" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="40005" />
 
-			<oSignal Name="valveInjectorDOnOff" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41014" />
-			<oSignal Name="valveInletDOnOff" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41015" />
-			<oSignal Name="dosUnitDValveRetract" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41016" />
-			<oSignal Name="dosUnitDValveExtend" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41017" />
+			<oSignal Name="valveInjectorDOnOff" IP="127.0.0.1" Class="com.systemj.ipc.OutputJSON" Port="41005" />
+			<oSignal Name="valveInletDOnOff" IP="127.0.0.1" Class="com.systemj.ipc.OutputJSON" Port="41005" />
+			<oSignal Name="dosUnitDValveRetract" IP="127.0.0.1" Class="com.systemj.ipc.OutputJSON" Port="41005" />
+			<oSignal Name="dosUnitDValveExtend" IP="127.0.0.1" Class="com.systemj.ipc.OutputJSON" Port="41005" />
 
 		</ClockDomain>
 	</SubSystem>

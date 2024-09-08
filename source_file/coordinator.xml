@@ -26,8 +26,9 @@
 			<iSignal Name="c2s_signal_conveyer_finished" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10050" />
 			<iSignal Name="c2s_signal_rotater_finished" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10051" />
 
-			<iSignal Name="input_signal_from_cloud" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10100" />
-			<oSignal Name="output_signal_to_cloud" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10101" />
+			<iSignal Name="input_signal_from_cloud" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="10100" />
+			<oSignal Name="output_signal_to_cloud" IP="127.0.0.1" Class="com.systemj.ipc.OutputJSON" Port="10101" />
+            <oSignal Name="s2c_signal_filler_order" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="20050" />
 		</ClockDomain>
 	</SubSystem>
 </System>

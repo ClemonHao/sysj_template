@@ -18,51 +18,32 @@ ControllerConveyer
         {
             case Controller_State.INITIAL:
                 emit c2s_signal_conveyer_register;
-                present(s2c_signal_conveyer_register_done)
+                System.out.println("waiting for s2c_signal_conveyer_register_done");
+
+                await(s2c_signal_conveyer_register_done);
+                status = Controller_State.DO_PROCESS;
+                System.out.println("Conveyer current status " + status);
+
+                break;
+            case Controller_State.DO_PROCESS:
+
+                present (bottleAtPos1)
                 {
-                    status = Controller_State.CHECK_BOTTLE;
-                    System.out.println("Conveyer current status " + status);
+                    emit motConveyorOnOff;
                 }
                 else
                 {}
-    
-                break;
 
-            case Controller_State.CHECK_BOTTLE:
-
-                //not bottle here
-                present (bottleLeftPos5 || bottleLeftPos5)
+                present (bottleLeftPos5)
                 {
-                    status = Controller_State.DO_PROCESS;
-                    System.out.println("Conveyer current status " + status);
+                    emit motConveyorOnOff;
                 }
                 else
-                {
-                    status = Controller_State.IDLE;
-                }
-                break;
+                {}
 
-            case Controller_State.DO_PROCESS:
-                    
-                //no process for conveyer here
-                System.out.println("conveyer do process");
-
-                status = Controller_State.IDLE;
-                System.out.println("Conveyer current status " + status);
-                break;
-
-            case Controller_State.IDLE:
-                emit c2s_signal_conveyer_idle;
-                //waiting for signal "move2NextPos"
-
-                await(s2c_signal_conveyer_move2next);
-
-                abort (bottleAtPos1) { sustain motConveyorOnOff; }
-                abort (bottleLeftPos5) { sustain motConveyorOnOff; }
-
+                //TODO
                 emit c2s_signal_conveyer_finished;
-                status = Controller_State.CHECK_BOTTLE;
-                System.out.println("Conveyer current status " + status);
+                emit c2s_signal_conveyer_idle;
                 break;
 
             default:

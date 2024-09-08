@@ -8,10 +8,10 @@
 			<oSignal Name="c2s_signal_rotater_finished" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10051" />
 
 
-			<iSignal Name="tableAlignedWithSensor" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="42011" />
-			<iSignal Name="bottleAtPos5" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40012" />
-			<iSignal Name="capOnBottleAtPos1" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="42013" />
-			<oSignal Name="rotaryTableTrigger" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="42014" />
+			<iSignal Name="tableAlignedWithSensor" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="40001" />
+			<iSignal Name="bottleAtPos5" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="40001" />
+			<iSignal Name="capOnBottleAtPos1" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="40001" />
+			<oSignal Name="rotaryTableTrigger" IP="127.0.0.1" Class="com.systemj.ipc.OutputJSON" Port="41001" />
 		</ClockDomain>
 	</SubSystem>
 </System>

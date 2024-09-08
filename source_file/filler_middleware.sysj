@@ -10,24 +10,33 @@ FillerMiddleware
     output String signal m2c_signal_liquid_A;
     input signal c2m_signal_filler_A_idle;
     output signal c2m_signal_filler_A_check_and_start;
+    input boolean signal c2m_signal_filler_A_no_bottle;
 
     input signal c2m_signal_liquid_B;
     output String signal m2c_signal_liquid_B;
     input signal c2m_signal_filler_B_idle;
     output signal c2m_signal_filler_B_check_and_start;
+    input boolean signal c2m_signal_filler_B_no_bottle;
 
     input signal c2m_signal_liquid_C;
     output String signal m2c_signal_liquid_C;
     input signal c2m_signal_filler_C_idle;
     output signal c2m_signal_filler_C_check_and_start;
+    input boolean signal c2m_signal_filler_C_no_bottle;
 
     input signal c2m_signal_liquid_D;
     output String signal m2c_signal_liquid_D;
     input signal c2m_signal_filler_D_idle;
     output signal c2m_signal_filler_D_check_and_start;
+    input boolean signal c2m_signal_filler_D_no_bottle;
 
     input String signal s2c_signal_filler_order;
 )->{
+    signal Sync;
+    signal modelA;
+    signal modelB;
+    signal modelC;
+    signal modelD;
 
     {
         int status = Controller_State.INITIAL;
@@ -37,7 +46,8 @@ FillerMiddleware
             {
                 case Controller_State.INITIAL:
                     //filler register
-                    if (FillerMiddlewareHandler.ingredient.GetCapacity() == FillerMiddlewareHandler.filler_list.GetListSize())
+
+                    if (FillerMiddlewareHandler.getInstance().ingredient.GetCapacity() == FillerMiddlewareHandler.getInstance().filler_list.GetListSize())
                     {
                         status = Controller_State.REGISTER;
                         System.out.println("filler current status " + status);
@@ -58,36 +68,54 @@ FillerMiddleware
                     break;
 
                 case Controller_State.PREPARE_FOR_PROCESS:
+                    //3
                     //check sensors here
                     await(s2c_signal_filler_do_process);
 
                     emit c2m_signal_filler_A_check_and_start;
+                    emit c2m_signal_filler_A_check_and_start;
+                    emit c2m_signal_filler_A_check_and_start;
+
                     emit c2m_signal_filler_B_check_and_start;
+                    emit c2m_signal_filler_B_check_and_start;
+                    emit c2m_signal_filler_B_check_and_start;
+
                     emit c2m_signal_filler_C_check_and_start;
+                    emit c2m_signal_filler_C_check_and_start;
+                    emit c2m_signal_filler_C_check_and_start;
+                    
+                    emit c2m_signal_filler_D_check_and_start;
+                    emit c2m_signal_filler_D_check_and_start;
                     emit c2m_signal_filler_D_check_and_start;
 
                     status = Controller_State.DO_PROCESS;
+                    System.out.println("filler current status " + status);
                     break;
 
                 case Controller_State.DO_PROCESS:
+                    //5
                     //TODO do process here
 
-                    System.out.println("do process");
-
-                    if (true == FillerMiddlewareHandler.filler_list.CheckAllIdleState())
+                    await (Sync);
+                    //if (true == FillerMiddlewareHandler.getInstance().filler_list.CheckAllIdleStateTest())
+                    if (true)
                     {
                         emit c2s_signal_filler_idle;
                         status = Controller_State.IDLE;
+                        System.out.println("filler current status " + status);
+                        FillerMiddlewareHandler.getInstance().filler_list.ResetAllIdleState();
                     }
 
                     break;
 
                 case Controller_State.IDLE:
+                    //6
                     //waiting for signal "move2NextPos;
-
 
                     await(s2c_signal_filler_move2next);
                     status = Controller_State.PREPARE_FOR_PROCESS;
+                    System.out.println("filler current status " + status);
+
                     break;
 
                 default:
@@ -103,67 +131,182 @@ FillerMiddleware
         {
             await(s2c_signal_filler_order);
 
-            LiquidIngredient ingre = new LiquidIngredient((String)#s2c_signal_filler_order);
+            String tmpstr = (String)#s2c_signal_filler_order;
 
-            emit m2c_signal_liquid_A(ingre.Get(1).toString());
-            emit m2c_signal_liquid_B(ingre.Get(2).toString());
-            emit m2c_signal_liquid_C(ingre.Get(3).toString());
-            emit m2c_signal_liquid_D(ingre.Get(4).toString());
+            LiquidIngredient ingre = new LiquidIngredient(tmpstr);
+            System.out.println("Coordinator get message from cloud " + tmpstr);
+
+            for (int i = 0; i < 4; ++i)
+            {
+                System.out.println("Ingredient " + i + ": " + ingre.Get(i).toString());
+            }
+
+            emit m2c_signal_liquid_A(ingre.Get(0).toString());
+            emit m2c_signal_liquid_B(ingre.Get(1).toString());
+            emit m2c_signal_liquid_C(ingre.Get(2).toString());
+            emit m2c_signal_liquid_D(ingre.Get(3).toString());
 
             pause;
         }
     }
     ||
     {
-        String module = FillerMiddlewareHandler.ingredient.IngredientNameList[0];
-        await(c2m_signal_liquid_A);
-        FillerMiddlewareHandler.filler_list.AddController(module);
+        String module = FillerMiddlewareHandler.getInstance().ingredient.IngredientNameList[0];
 
         loop
         {
-            await(c2m_signal_filler_A_idle);
-            FillerMiddlewareHandler.filler_list.SetSpecificState(module);
-            System.out.println("Filler Hub get idle from " + module);
+            await(c2m_signal_liquid_A);
+            FillerMiddlewareHandler.getInstance().filler_list.AddController(module);
+
+            loop
+            {
+                present(c2m_signal_filler_A_no_bottle)
+                {
+                    FillerMiddlewareHandler.getInstance().filler_list.SetSpecificForbiddenState(module, (boolean)#c2m_signal_filler_A_no_bottle);
+                }
+                else
+                {}
+
+                present(c2m_signal_filler_A_idle)
+                {
+                    FillerMiddlewareHandler.getInstance().filler_list.SetSpecificState(module);
+                    emit modelA;
+                }
+                else
+                {}
+                pause;
+            }
+
             pause;
         }
     }
     ||
     {
-        String module = FillerMiddlewareHandler.ingredient.IngredientNameList[1];
-        await(c2m_signal_liquid_B);
-        FillerMiddlewareHandler.filler_list.AddController(module);
+        String module = FillerMiddlewareHandler.getInstance().ingredient.IngredientNameList[1];
+
         loop
         {
-            await(c2m_signal_filler_B_idle);
-            FillerMiddlewareHandler.filler_list.SetSpecificState(module);
-            System.out.println("Filler Hub get idle from " + module);
+            await(c2m_signal_liquid_B);
+            FillerMiddlewareHandler.getInstance().filler_list.AddController(module);
+            loop
+            {
+                present(c2m_signal_filler_B_no_bottle)
+                {
+                    FillerMiddlewareHandler.getInstance().filler_list.SetSpecificForbiddenState(module, (boolean)#c2m_signal_filler_B_no_bottle);
+                }
+                else
+                {}
+
+                present(c2m_signal_filler_B_idle)
+                {
+                    FillerMiddlewareHandler.getInstance().filler_list.SetSpecificState(module);
+                    emit modelB;
+                }
+                else
+                {}
+                pause;
+            }
             pause;
         }
     }
     ||
     {
-        String module = FillerMiddlewareHandler.ingredient.IngredientNameList[2];
-        await(c2m_signal_liquid_C);
-        FillerMiddlewareHandler.filler_list.AddController(module);
+        String module = FillerMiddlewareHandler.getInstance().ingredient.IngredientNameList[2];
+
         loop
         {
-            await(c2m_signal_filler_C_idle);
-            FillerMiddlewareHandler.filler_list.SetSpecificState(module);
-            System.out.println("Filler Hub get idle from " + module);
+            await(c2m_signal_liquid_C);
+            FillerMiddlewareHandler.getInstance().filler_list.AddController(module);
+            loop
+            {
+                present(c2m_signal_filler_C_no_bottle)
+                {
+                    FillerMiddlewareHandler.getInstance().filler_list.SetSpecificForbiddenState(module, (boolean)#c2m_signal_filler_C_no_bottle);
+                }
+                else
+                {}
+
+                present(c2m_signal_filler_C_idle)
+                {
+                    FillerMiddlewareHandler.getInstance().filler_list.SetSpecificState(module);
+                    emit modelC;
+                }
+                else
+                {}
+                pause;
+            }
             pause;
         }
     }
     ||
     {
-        String module = FillerMiddlewareHandler.ingredient.IngredientNameList[3];
-        await(c2m_signal_liquid_D);
-        FillerMiddlewareHandler.filler_list.AddController(module);
+        String module = FillerMiddlewareHandler.getInstance().ingredient.IngredientNameList[3];
+
         loop
         {
-            await(c2m_signal_filler_D_idle);
-            FillerMiddlewareHandler.filler_list.SetSpecificState(module);
-            System.out.println("Filler Hub get idle from " + module);
+            await(c2m_signal_liquid_D);
+            FillerMiddlewareHandler.getInstance().filler_list.AddController(module);
+            loop
+            {
+                present (c2m_signal_filler_D_no_bottle)
+                {
+                    FillerMiddlewareHandler.getInstance().filler_list.SetSpecificForbiddenState(module, (boolean)#c2m_signal_filler_D_no_bottle);
+                }
+                else
+                {}
+
+                present(c2m_signal_filler_D_idle)
+                {
+                    FillerMiddlewareHandler.getInstance().filler_list.SetSpecificState(module);
+                    emit modelD;
+                }
+                else
+                {}
+                pause;
+            }
             pause;
         }
+    }
+    ||
+    {
+        int count = 0;
+        loop
+        {
+            present(modelA)
+            {
+                count |= 8;
+            }
+            else
+            {}
+
+            present(modelB)
+            {
+                count |= 4;
+            }
+            else
+            {}
+
+            present(modelC)
+            {
+                count |= 2;
+            }
+            else
+            {}
+
+            present(modelD)
+            {
+                count |= 1;
+            }
+            else
+            {}
+
+            if (count == 15)
+            {
+                emit Sync;
+                count = 0;
+            }
+            pause;
+        }
+
     }
 }

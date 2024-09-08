@@ -3,6 +3,7 @@ FillerC
     input String signal m2c_signal_liquid_C;
     output signal c2m_signal_liquid_C;
     output signal c2m_signal_filler_C_idle;
+    output boolean signal c2m_signal_filler_C_no_bottle;
     input signal c2m_signal_filler_C_check_and_start;
 
     input signal bottleAtPos2C, bottleAtPos2CFull, dosUnitCEvac, dosUnitCAtTarget;
@@ -21,9 +22,12 @@ FillerC
             {
                 case Controller_State.INITIAL:
                     emit c2m_signal_liquid_C;
+                    emit c2m_signal_liquid_C;
+                    emit c2m_signal_liquid_C;
 
                     await(c2m_signal_filler_C_check_and_start);
                     status = Controller_State.CHECK_BOTTLE;
+                    System.out.println("Filler C current status " + status);
 
                     break;
 
@@ -32,11 +36,13 @@ FillerC
 
                     present (bottleAtPos2C)
                     {
+                        emit c2m_signal_filler_C_no_bottle(false);
                         status = Controller_State.DO_PROCESS;
+                        System.out.println("Filler C current status " + status);
                     }
                     else
                     {
-                        status = Controller_State.IDLE;
+                        emit c2m_signal_filler_C_no_bottle(true);
                     }
                     break;
 
@@ -44,30 +50,29 @@ FillerC
                     System.out.println("filler C do process");
                     //check queue.GetCurrentIngredient();
 
-                    FillerHandler.liquid_queue_C.PopOneBottle();
-
                     emit openInjector;
 
+                    System.out.println("Filler C emit openInletor");
                     pause;
 
                     present (dosUnitCEvac)
                     {
+                        System.out.println("Filler C get dosUnitAEvac");
                         abort (dosUnitCAtTarget) { sustain dosUnitCValveRetract;}
                     }
                     else
                     {}
 
                     emit closeInjector;
-
+                    System.out.println("Filler C get emit closeInjector");
                     pause;
 
                     emit openInlet;
-
+                    System.out.println("Filler C get emit openInlet");
                     pause;
 
                     abort (dosUnitCEvac || bottleAtPos2CFull) { sustain dosUnitCValveExtend; }
 
-                    // if the bottle is full, close inlet, open injector, let the liquid back to the bank.
                     present (bottleAtPos2CFull)
                     {
                         emit closeInlet;
@@ -80,15 +85,21 @@ FillerC
                     {}
 
                     emit closeInlet;
+                    System.out.println("Filler C get emit closeInlet");
 
+                    FillerHandler.getInstance().liquid_queue_C.PopOneBottle();
                     status = Controller_State.IDLE;
+                    System.out.println("Filler C current status " + status);
                     break;
 
                 case Controller_State.IDLE:
                     emit c2m_signal_filler_C_idle;
+                    emit c2m_signal_filler_C_idle;
+                    emit c2m_signal_filler_C_idle;
                     await(c2m_signal_filler_C_check_and_start);
 
                     status = Controller_State.CHECK_BOTTLE;
+                    System.out.println("Filler C current status " + status);
                     break;
 
                 default:
@@ -103,14 +114,17 @@ FillerC
         {
             await(m2c_signal_liquid_C);
             //upate ingredient list
+            String tmpstr = (String)#m2c_signal_liquid_C;
 
-            FillerHandler.liquid_queue_C.PushOneQueue((String)#m2c_signal_liquid_C);
+            System.out.println("Filler C get " + tmpstr);
+            FillerHandler.getInstance().liquid_queue_C.PushOneQueue(tmpstr);
             pause;
         }
     }
     ||
     {
-        loop {
+        loop
+        {
             await (openInjector);
 
             abort (closeInjector) { sustain valveInjectorCOnOff; }
@@ -120,7 +134,8 @@ FillerC
     }
     ||
     {
-        loop {
+        loop
+        {
             await (openInlet);
 
             abort (closeInlet) { sustain valveInletCOnOff; }

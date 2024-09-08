@@ -7,17 +7,17 @@
 			<iSignal Name="s2c_signal_capper_do_process" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="10004" />
 			<oSignal Name="c2s_signal_capper_idle" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="10002" />
 
-			<iSignal Name="bottleAtPos4" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40013" />
-			<iSignal Name="gripperZAxisLowered" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40022" />
-			<iSignal Name="gripperZAxisLifted" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40023" />
-			<iSignal Name="gripperTurnHomePos" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40024" />
-			<iSignal Name="gripperTurnFinalPos" IP="127.0.0.1" Class="com.systemj.ipc.TCPReceiver" Port="40025" />
+			<iSignal Name="bottleAtPos4" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="40006" />
+			<iSignal Name="gripperZAxisLowered" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="40006" />
+			<iSignal Name="gripperZAxisLifted" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="40006" />
+			<iSignal Name="gripperTurnHomePos" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="40006" />
+            <iSignal Name="gripperTurnFinalPos" IP="127.0.0.1" Class="com.systemj.ipc.InputJSON" Port="40006" />
 
-			<oSignal Name="cylPos5ZaxisExtend" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41018" />
-			<oSignal Name="gripperTurnRetract" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41019" />
-			<oSignal Name="gripperTurnExtend" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41020" />
-			<oSignal Name="capGripperPos5Extend" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41021" />
-			<oSignal Name="cylClampBottleExtend" IP="127.0.0.1" Class="com.systemj.ipc.TCPSender" Port="41022" />
+			<oSignal Name="cylPos5ZaxisExtend" IP="127.0.0.1" Class="com.systemj.ipc.OutputJSON" Port="41006" />
+			<oSignal Name="gripperTurnRetract" IP="127.0.0.1" Class="com.systemj.ipc.OutputJSON" Port="41006" />
+			<oSignal Name="gripperTurnExtend" IP="127.0.0.1" Class="com.systemj.ipc.OutputJSON" Port="41006" />
+			<oSignal Name="capGripperPos5Extend" IP="127.0.0.1" Class="com.systemj.ipc.OutputJSON" Port="41006" />
+			<oSignal Name="cylClampBottleExtend" IP="127.0.0.1" Class="com.systemj.ipc.OutputJSON" Port="41006" />
 		</ClockDomain>
 	</SubSystem>
 </System>
