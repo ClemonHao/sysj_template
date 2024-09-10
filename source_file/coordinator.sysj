@@ -62,8 +62,6 @@ Coordinator
                     await(c2s_signal_rotater_finished);
 
                     emit s2c_signal_filler_do_process;
-                    emit s2c_signal_filler_do_process;
-                    emit s2c_signal_capper_do_process;
                     emit s2c_signal_capper_do_process;
 
                     status = Coordinator_State.WAITING_FOR_IDLE;
@@ -73,11 +71,8 @@ Coordinator
                 case Coordinator_State.WAITING_FOR_IDLE:
                     //check status
 
-                    await (Sync);
-
-                    //boardcast message
-                    //if (true == ControllerHandler.getInstance().controller_list.CheckAllIdleState())
-                    if (true)
+                    //await (Sync);
+                    if (true == ControllerHandler.getInstance().controller_list.CheckAllIdleState())
                     {
                         status = Coordinator_State.SENDING_MOVE_COMMAND;
                         System.out.println("Coordinator current status " + status);
@@ -87,6 +82,7 @@ Coordinator
                 case Coordinator_State.SENDING_MOVE_COMMAND:
                     //4
 
+                    //TODO: should be save in a list
                     emit s2c_signal_filler_move2next;
                     emit s2c_signal_capper_move2next;
                     emit s2c_signal_rotater_move2next;
@@ -94,17 +90,19 @@ Coordinator
 
                     //waiting controller_list --;
                     //queue++
-                    //ControllerHandler.getInstance().bottle_queue.dequeue();
-                    //ControllerHandler.getInstance().bottle_queue.enqueue(ControllerHandler.getInstance().waiting_list.PopBottle());
+                    if (null != ControllerHandler.getInstance().bottle_queue.dequeue())
+                    {
+                        String str = ControllerHandler.getInstance().waiting_list.PopBottle().ToJsonString();
+                        emit output_signal_to_cloud(str);
+                        System.out.println(str);
+                    }
 
-                    String str = ControllerHandler.getInstance().waiting_list.PopBottle().ToJsonString();
-                    emit output_signal_to_cloud(str);
-                    System.out.println(str);
+                    ControllerHandler.getInstance().bottle_queue.enqueue(ControllerHandler.getInstance().waiting_list.PopBottle());
+
 
                     ControllerHandler.getInstance().controller_list.ResetAllIdleState();
 
-                    //if (ControllerHandler.getInstance().bottle_queue.isEmpty() && ControllerHandler.getInstance().waiting_list.IsEmpty())
-                    if (ControllerHandler.getInstance().waiting_list.IsEmpty())
+                    if (ControllerHandler.getInstance().bottle_queue.isEmpty() && ControllerHandler.getInstance().waiting_list.IsEmpty())
                     {
                         status = Coordinator_State.WAITING_FOR_ORDER;
                         System.out.println("Coordinator current status " + status);
@@ -262,8 +260,6 @@ Coordinator
             emit s2c_signal_filler_order((String)#input_signal_from_cloud);
 
             ControllerHandler.getInstance().waiting_list.AppendListWithJson((String)#input_signal_from_cloud);
-            //if (!ControllerHandler.getInstance().bottle_queue.isFull())
-            //    ControllerHandler.getInstance().bottle_queue.enqueue(ControllerHandler.getInstance().waiting_list.PopBottle());
 
             pause;
         }
@@ -275,7 +271,7 @@ Coordinator
         {
             present(modelCapper)
             {
-                count |= 4;
+                //count |= 4;
             }
             else
             {}
@@ -287,7 +283,7 @@ Coordinator
             else
             {}
 
-            if (count == 6)
+            if (count == 2)
             {
                 emit Sync;
                 count = 0;

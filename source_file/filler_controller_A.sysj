@@ -22,8 +22,6 @@ FillerA
             {
                 case Controller_State.INITIAL:
                     emit c2m_signal_liquid_A;
-                    emit c2m_signal_liquid_A;
-                    emit c2m_signal_liquid_A;
 
                     await(c2m_signal_filler_A_check_and_start);
                     status = Controller_State.CHECK_BOTTLE;
@@ -93,8 +91,6 @@ FillerA
                     break;
 
                 case Controller_State.IDLE:
-                    emit c2m_signal_filler_A_idle;
-                    emit c2m_signal_filler_A_idle;
                     emit c2m_signal_filler_A_idle;
                     await(c2m_signal_filler_A_check_and_start);
 

@@ -26,24 +26,15 @@ ControllerCapper
 
                     present (s2c_signal_capper_register_done)
                     {
-                        status = Controller_State.PREPARE_FOR_PROCESS;
+                        status = Controller_State.CHECK_BOTTLE;
                         System.out.println("capper current status " + status);
                     }
                     else
                     {}
-
-                    break;
-                case Controller_State.PREPARE_FOR_PROCESS:
-                    //check sensors here
-                    await (s2c_signal_capper_do_process);
-
-                    status = Controller_State.CHECK_BOTTLE;
-                    System.out.println("capper current status " + status);
                     break;
 
                 case Controller_State.CHECK_BOTTLE:
-                    //not bottle here
-
+                    //no bottle here
                     present (bottleAtPos4)
                     {
                         status = Controller_State.DO_PROCESS;
@@ -56,8 +47,8 @@ ControllerCapper
                     break;
 
                 case Controller_State.DO_PROCESS:
-                    //TODO do process here
                     System.out.println("capper do process");
+                    await (s2c_signal_capper_do_process);
 
                     emit clampBottle;
                     emit lowerGripper;
@@ -65,22 +56,18 @@ ControllerCapper
                     await (gripperZAxisLowered);
 
                     emit gripCap;
-                    System.out.println("Capper emit gripCap");
 
                     abort (gripperTurnFinalPos) { sustain gripperTurnExtend; }
 
                     emit releaseCap;
-                    System.out.println("Capper emit releaseCap");
 
                     abort (gripperTurnHomePos) { sustain gripperTurnRetract; }
 
                     emit raiseGripper;
-                    System.out.println("Capper emit raiseGripper");
 
                     await (gripperZAxisLifted);
 
                     emit unclampBottle;
-                    System.out.println("Capper emit unclampBottle");
 
                     status = Controller_State.IDLE;
                     System.out.println("capper current status " + status);
@@ -88,13 +75,14 @@ ControllerCapper
 
                 case Controller_State.IDLE:
                     emit c2s_signal_capper_idle;
-                    emit c2s_signal_capper_idle;
-                    emit c2s_signal_capper_idle;
-                    //waiting for signal "move2NextPos"
 
-                    await(s2c_signal_capper_move2next);
+                    present(s2c_signal_capper_move2next)
+                    {
+                        status = Controller_State.CHECK_BOTTLE;
+                    }
+                    else
+                    {}
 
-                    status = Controller_State.PREPARE_FOR_PROCESS;
                     break;
 
                 default:

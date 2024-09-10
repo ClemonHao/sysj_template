@@ -73,19 +73,8 @@ FillerMiddleware
                     await(s2c_signal_filler_do_process);
 
                     emit c2m_signal_filler_A_check_and_start;
-                    emit c2m_signal_filler_A_check_and_start;
-                    emit c2m_signal_filler_A_check_and_start;
-
                     emit c2m_signal_filler_B_check_and_start;
-                    emit c2m_signal_filler_B_check_and_start;
-                    emit c2m_signal_filler_B_check_and_start;
-
                     emit c2m_signal_filler_C_check_and_start;
-                    emit c2m_signal_filler_C_check_and_start;
-                    emit c2m_signal_filler_C_check_and_start;
-                    
-                    emit c2m_signal_filler_D_check_and_start;
-                    emit c2m_signal_filler_D_check_and_start;
                     emit c2m_signal_filler_D_check_and_start;
 
                     status = Controller_State.DO_PROCESS;
@@ -96,9 +85,8 @@ FillerMiddleware
                     //5
                     //TODO do process here
 
-                    await (Sync);
-                    //if (true == FillerMiddlewareHandler.getInstance().filler_list.CheckAllIdleStateTest())
-                    if (true)
+                    //await (Sync);
+                    if (true == FillerMiddlewareHandler.getInstance().filler_list.CheckAllIdleStateTest())
                     {
                         emit c2s_signal_filler_idle;
                         status = Controller_State.IDLE;
@@ -163,6 +151,8 @@ FillerMiddleware
                 present(c2m_signal_filler_A_no_bottle)
                 {
                     FillerMiddlewareHandler.getInstance().filler_list.SetSpecificForbiddenState(module, (boolean)#c2m_signal_filler_A_no_bottle);
+                    if (true == (boolean)#c2m_signal_filler_A_no_bottle)
+                        emit modelA;
                 }
                 else
                 {}
@@ -193,6 +183,9 @@ FillerMiddleware
                 present(c2m_signal_filler_B_no_bottle)
                 {
                     FillerMiddlewareHandler.getInstance().filler_list.SetSpecificForbiddenState(module, (boolean)#c2m_signal_filler_B_no_bottle);
+                    
+                    if (true == (boolean)#c2m_signal_filler_A_no_bottle)
+                        emit modelA;
                 }
                 else
                 {}
@@ -222,6 +215,7 @@ FillerMiddleware
                 present(c2m_signal_filler_C_no_bottle)
                 {
                     FillerMiddlewareHandler.getInstance().filler_list.SetSpecificForbiddenState(module, (boolean)#c2m_signal_filler_C_no_bottle);
+                    emit modelC;
                 }
                 else
                 {}
@@ -251,6 +245,7 @@ FillerMiddleware
                 present (c2m_signal_filler_D_no_bottle)
                 {
                     FillerMiddlewareHandler.getInstance().filler_list.SetSpecificForbiddenState(module, (boolean)#c2m_signal_filler_D_no_bottle);
+                    emit modelD;
                 }
                 else
                 {}

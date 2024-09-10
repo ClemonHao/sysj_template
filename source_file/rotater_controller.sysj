@@ -27,6 +27,18 @@ ControllerRotater
 
                     break;
 
+                case Controller_State.PREPARE_FOR_PROCESS:
+                    present (tableAlignedWithSensor)
+                    {
+                        emit rotaryTableTrigger;
+                        status = Controller_State.DO_PROCESS;
+                        System.out.println("Rotater current status " + status);
+                    }
+                    else
+                    {}
+
+                    break;
+
                 case Controller_State.DO_PROCESS:
 
                     present (bottleAtPos5 || capOnBottleAtPos1)
@@ -35,8 +47,6 @@ ControllerRotater
                     {
                         emit rotaryTableTrigger;
 
-                        pause;
-                        pause;
                         pause;
 
                         present (tableAlignedWithSensor)
@@ -51,12 +61,10 @@ ControllerRotater
 
                 case Controller_State.IDLE:
                     emit c2s_signal_rotater_idle;
-                    emit c2s_signal_rotater_idle;
-                    emit c2s_signal_rotater_idle;
 
                     present(s2c_signal_rotater_move2next)
                     {
-                        status = Controller_State.DO_PROCESS;
+                        status = Controller_State.PREPARE_FOR_PROCESS;
                         System.out.println("Rotater current status " + status);
                     }
                     else
@@ -80,6 +88,27 @@ ControllerRotater
             }
             else
             {}
+
+            pause;
+        }
+    }
+    ||
+    {
+        loop
+        {
+            present (tableAlignedWithSensor)
+            {
+            }
+            else
+            {
+                present (bottleAtPos5 || capOnBottleAtPos1)
+                {}
+                else
+                {
+
+                    emit rotaryTableTrigger;
+                }
+            }
 
             pause;
         }

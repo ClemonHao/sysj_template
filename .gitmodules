@@ -1,0 +1,3 @@
+[submodule "3rd/sysj_3rd_env"]
+	path = 3rd/sysj_3rd_env
+	url = https://github.com/ClemonHao/sysj_3rd_env.git
